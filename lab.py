@@ -1,5 +1,5 @@
 """
-
+lab2
 """
 from queue import PriorityQueue
 
@@ -10,8 +10,6 @@ def read_file(filename: str)-> list[list]:
     >>> with tempfile.NamedTemporaryFile('w', delete=False) as tmp:
     ...     _=tmp.write('1 14 15 234\\n23 34 5 5')
     >>> read_file(tmp.name)
-    [[1, 14, 15, 234], [23, 34, 5, 5]]
-    >>> read_file('data.txt')
     [[1, 14, 15, 234], [23, 34, 5, 5]]
     """
     raw_data = []
@@ -25,8 +23,10 @@ def get_distance(start_point: (int, int),
                         height_matrx: list[list], 
                         step: int)-> list[list]:
     """
-    >>> get_distance((0, 0), (1,2), [[1, 14, 15, 234], [23, 34, 5, 5]], 2)
-     
+    >>> get_distance((0, 0), (1, 2), [[1, 14, 15, 234], [23, 34, 5, 5]], 2)
+    inf
+    >>> get_distance((0, 0), (0, 1), [[5,2],[1,2]],4)
+    5.0
     """
     if start_point[0] == end_point[0] and abs(start_point[1] - end_point[1]) == 1:
         distance = height_matrx[start_point[0]][start_point[1]] \
@@ -37,7 +37,9 @@ def get_distance(start_point: (int, int),
         distance = height_matrx[start_point[0]][start_point[1]] \
             - height_matrx[end_point[0]][end_point[1]]
         return (step ** 2 + distance ** 2) ** 0.5
-    return float("inf")
+    return float('inf')
+    # return (step ** 2 + distance ** 2) ** 0.5 if end_point in\
+    # get_neighbours(start_point,height_matrx) else float("inf")
 
 def get_neighbours(point: (int, int),matrix: list[list])-> list[tuple]:
     """
@@ -57,19 +59,23 @@ def get_neighbours(point: (int, int),matrix: list[list])-> list[tuple]:
 def is_valid(point: (int,int), matrix: list[list])-> bool:
     """
     Check if given point is valid
+    >>> is_valid((10,10),[[1,1],[2,3]])
+    False
     """
     return point[0] in range(0,len(matrix)) and point[1] in range(0,len(matrix[0]))
 
 def heuristic(start_point: (int, int), end_point: (int, int)) -> int:
     """
     Calculates distance between indexes
+    >>> heuristic((0, 5), (10, 3))
+    12
     """
     return abs(start_point[0] - end_point[0] ) + abs(start_point[1] - end_point[1])
 
 
 def reconstruct_path(came_from: dict, current: (int, int)):
     """
-    Reconstructs path
+    Recreates path to the point
     """
     total_path = [current]
     while current in came_from.keys():
@@ -85,12 +91,6 @@ def a_star(start_point: (int,int),
            step: int)-> float:
     """
     A star algorithms
-    >>> height_matrix = read_file("data.txt")
-    >>> start = (0, 0)
-    >>> end = (4000, 4000)
-    >>> step = 1
-    >>> a_star(start_point=start, end_point=end, height_matrix=height_matrix, step=1)
-
 
     """
     if not is_valid(start_point,height_matrix) or not is_valid(end_point,height_matrix):
@@ -121,13 +121,34 @@ def a_star(start_point: (int,int),
                 came_from[next_point] = current
 
     return -1
-import time
-t=time.time()
-height_matrix = read_file("data.txt")
-print(f"readfile time = {time.time()-t}")
-t=time.time()
-start = (0, 0)
-end = (900, 800)
-step = 1
-a_star(start_point=start, end_point=end, height_matrix=height_matrix, step=1)
-print(f"a_star time  = {time.time()-t}")
+
+# if __name__=='__main__':
+    # import doctest
+    # print(doctest.testmod())
+    # import time
+    # from random import randint
+    # height_matrix = read_file("data.txt")
+    
+    # def print_rand_elem(matrix):
+    #     print(matrix[0][1])
+    
+    # func_total=0
+    # no_func_total=0
+    # for i in range(250000000):
+    #     t=time.time()
+    #     print_rand_elem(height_matrix)
+    #     t=time.time()-t
+    #     func_total+=t
+    #     print(f"func time = {t}")
+    #     t=time.time()
+    #     print(height_matrix[0][1])
+    #     t=time.time()-t
+    #     no_func_total+=t
+    #     print(f"no func time ={t} ")
+    # print(f"{func_total=},{no_func_total}")
+    # print(f"readfile time = {time.time()-t}")
+    # t=time.time()
+    # start = (0, 0)
+    # end = (3000, 3000)
+    # a_star(start_point=start, end_point=end, height_matrix=height_matrix, step=1)
+    # print(f"a_star time  = {time.time()-t}")
