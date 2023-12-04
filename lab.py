@@ -46,14 +46,14 @@ def get_distance(start_point: (int, int),
     >>> get_distance((0, 0), (0, 1), [[5,2],[1,2]],4)
     5.0
     """
-    if (start_point, end_point) in DISTANCE_CACHE:
-        return DISTANCE_CACHE[(start_point, end_point)]
+    #if (start_point, end_point) in DISTANCE_CACHE:
+     #   return DISTANCE_CACHE[(start_point, end_point)]
 
     distance = height_matrx[start_point[0]][start_point[1]] - height_matrx[end_point[0]][end_point[1]]
     distance = (step ** 2 + distance ** 2) ** 0.5
-
-    DISTANCE_CACHE[(start_point, end_point)] = distance
-    return DISTANCE_CACHE[(start_point, end_point)]
+    return distance
+    #DISTANCE_CACHE[(start_point, end_point)] = distance
+    #return DISTANCE_CACHE[(start_point, end_point)]
 
 
 NEIGHBOURS_CACHE = {}
@@ -66,8 +66,8 @@ def get_neighbours(point: (int, int),matrix: list[list])-> list[tuple]:
     [(1, 2), (0, 1), (1, 0)]
     """
 
-    if point in NEIGHBOURS_CACHE:
-        return NEIGHBOURS_CACHE[point]
+    #if point in NEIGHBOURS_CACHE:
+     #   return NEIGHBOURS_CACHE[point]
 
     neighbours=[]
     coordinates_delta=[1,-1]
@@ -76,7 +76,7 @@ def get_neighbours(point: (int, int),matrix: list[list])-> list[tuple]:
             neighbours.append((point[0]+coordinates_delta[i], point[1]))
         if 0<=point[1]+coordinates_delta[i] < len(matrix[0]):
             neighbours.append((point[0],point[1]+coordinates_delta[i]))
-    NEIGHBOURS_CACHE[point] = neighbours    
+    #NEIGHBOURS_CACHE[point] = neighbours    
     return neighbours
 
 def is_valid(point: (int,int), matrix: list[list])-> bool:
@@ -149,14 +149,14 @@ t=read_file('data.txt')
 print("file_read finished")
 
 start_point = (0, 0)
-end_point = (800,800)
+end_point = (4999,4999)
 
 import time
 start = time.time()
 result = a_star(start_point=start_point, end_point=end_point, height_matrix=t, step=1)
 print(time.time() - start)
 
-print(result)
+#print(result)
 
 
 
