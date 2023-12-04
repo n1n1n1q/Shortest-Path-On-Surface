@@ -2,7 +2,22 @@
 lab2
 """
 import cProfile
-from queue import PriorityQueue
+import heapq
+
+
+class PriorityQueue:
+    def __init__(self):
+        self.elements = []
+
+    def empty(self):
+        return len(self.elements) == 0
+
+    def put(self, item, priority):
+        heapq.heappush(self.elements, (priority, item))
+
+    def get(self):
+        return heapq.heappop(self.elements)[1]
+
 
 def read_file(filename: str)-> list[list]:
     """
@@ -61,7 +76,7 @@ def get_neighbours(point: (int, int),matrix: list[list])-> list[tuple]:
             neighbours.append((point[0]+coordinates_delta[i], point[1]))
         if 0<=point[1]+coordinates_delta[i] < len(matrix[0]):
             neighbours.append((point[0],point[1]+coordinates_delta[i]))
-    NEIGHBOURS_CACHE[point] = neighbours
+    NEIGHBOURS_CACHE[point] = neighbours    
     return neighbours
 
 def is_valid(point: (int,int), matrix: list[list])-> bool:
@@ -71,6 +86,7 @@ def is_valid(point: (int,int), matrix: list[list])-> bool:
     False
     """
     return point[0] in range(0,len(matrix)) and point[1] in range(0,len(matrix[0]))
+
 
 def heuristic(start_point: (int, int), end_point: (int, int)) -> int:
     """
@@ -104,7 +120,7 @@ def a_star(start_point: (int,int),
     if not is_valid(start_point,height_matrix) or not is_valid(end_point,height_matrix):
         return -1
     open_set = PriorityQueue()
-    open_set.put(start_point)
+    open_set.put(start_point, 0)
     came_from = {}
     cost = {}
 
@@ -116,7 +132,6 @@ def a_star(start_point: (int,int),
 
         if current == end_point:
             return reconstruct_path(came_from, current)
-        #rint(get_neighbours(current, height_matrix))
         for next_point in get_neighbours(current, height_matrix):
             new_cost = cost[current] + get_distance(start_point=current,
                                                     end_point=next_point,
@@ -134,7 +149,7 @@ t=read_file('data.txt')
 print("file_read finished")
 
 start_point = (0, 0)
-end_point = (4,1)
+end_point = (800,800)
 
 import time
 start = time.time()
@@ -142,15 +157,6 @@ result = a_star(start_point=start_point, end_point=end_point, height_matrix=t, s
 print(time.time() - start)
 
 print(result)
-
-
-
-
-
-
-
-
-
 
 
 
