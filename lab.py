@@ -1,6 +1,7 @@
 """
 lab2
 """
+import cProfile
 from queue import PriorityQueue
 
 def read_file(filename: str)-> list[list]:
@@ -18,6 +19,8 @@ def read_file(filename: str)-> list[list]:
                       for line in file.readlines()  ]
     return raw_data
 
+DISTANCE_CACHE = {}
+
 def get_distance(start_point: (int, int), 
                         end_point: (int, int),
                         height_matrx: list[list], 
@@ -28,18 +31,18 @@ def get_distance(start_point: (int, int),
     >>> get_distance((0, 0), (0, 1), [[5,2],[1,2]],4)
     5.0
     """
-    if start_point[0] == end_point[0] and abs(start_point[1] - end_point[1]) == 1:
-        distance = height_matrx[start_point[0]][start_point[1]] \
-            - height_matrx[end_point[0]][end_point[1]]
-        return (step ** 2 + distance ** 2) ** 0.5
-    if start_point[1] == end_point[1] and abs(start_point[0] \
-                                              - end_point[0]) == 1:
-        distance = height_matrx[start_point[0]][start_point[1]] \
-            - height_matrx[end_point[0]][end_point[1]]
-        return (step ** 2 + distance ** 2) ** 0.5
-    return float('inf')
-    # return (step ** 2 + distance ** 2) ** 0.5 if end_point in\
-    # get_neighbours(start_point,height_matrx) else float("inf")
+    if (start_point, end_point) in DISTANCE_CACHE:
+        return DISTANCE_CACHE[(start_point, end_point)]
+
+    distance = height_matrx[start_point[0]][start_point[1]] - height_matrx[end_point[0]][end_point[1]]
+    distance = (step ** 2 + distance ** 2) ** 0.5
+
+    DISTANCE_CACHE[(start_point, end_point)] = distance
+    return DISTANCE_CACHE[(start_point, end_point)]
+
+
+NEIGHBOURS_CACHE = {}
+
 
 def get_neighbours(point: (int, int),matrix: list[list])-> list[tuple]:
     """
@@ -47,13 +50,18 @@ def get_neighbours(point: (int, int),matrix: list[list])-> list[tuple]:
     >>> get_neighbours((1,1),[[1,1,1,1],[1,1,1,1]])
     [(1, 2), (0, 1), (1, 0)]
     """
+
+    if point in NEIGHBOURS_CACHE:
+        return NEIGHBOURS_CACHE[point]
+
     neighbours=[]
     coordinates_delta=[1,-1]
     for i in range(2):
-        if point[0]+coordinates_delta[i] in range(0,len(matrix)):
+        if 0<=point[0]+coordinates_delta[i] < len(matrix):
             neighbours.append((point[0]+coordinates_delta[i], point[1]))
-        if point[1]+coordinates_delta[i] in range(0, len(matrix[0])):
+        if 0<=point[1]+coordinates_delta[i] < len(matrix[0]):
             neighbours.append((point[0],point[1]+coordinates_delta[i]))
+    NEIGHBOURS_CACHE[point] = neighbours
     return neighbours
 
 def is_valid(point: (int,int), matrix: list[list])-> bool:
@@ -108,12 +116,12 @@ def a_star(start_point: (int,int),
 
         if current == end_point:
             return reconstruct_path(came_from, current)
-
+        #rint(get_neighbours(current, height_matrix))
         for next_point in get_neighbours(current, height_matrix):
             new_cost = cost[current] + get_distance(start_point=current,
                                                     end_point=next_point,
                                                     height_matrx=height_matrix,
-                                                    step=step)
+                                                    step=step) 
             if next_point not in cost or new_cost < cost[next_point]:
                 cost[next_point] = new_cost
                 priority = new_cost + heuristic(end_point, next_point)
@@ -122,6 +130,35 @@ def a_star(start_point: (int,int),
 
     return -1
 
+t=read_file('data.txt')
+print("file_read finished")
+
+start_point = (0, 0)
+end_point = (4,1)
+
+import time
+start = time.time()
+result = a_star(start_point=start_point, end_point=end_point, height_matrix=t, step=1)
+print(time.time() - start)
+
+print(result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#print(a_star((0,0),(4,4),read_file('data.txt'),1))
 # if __name__=='__main__':
     # import doctest
     # print(doctest.testmod())
